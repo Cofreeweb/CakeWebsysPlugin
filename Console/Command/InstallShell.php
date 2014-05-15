@@ -17,6 +17,28 @@ class InstallShell extends StartupShell
       'es' => 'Español', 
   );
   
+/**
+ * El título del sitio web
+ * Se usará para la configuración por defecto en la base de datos
+ *
+ * @var string
+ */
+  public $siteTitle;
+  
+/**
+ * El dominio del sitio
+ * Solo se usa para colocarlo en el fichero core.php (no va en git)
+ *
+ * @var string
+ */
+  public $siteDomain;
+  
+  
+/**
+ * Realiza la instalación
+ *
+ * @return void
+ */
   public function app()
   {
     $this->setDatabase();
@@ -27,8 +49,23 @@ class InstallShell extends StartupShell
     $this->schemaCreate( 'app');
     $this->cmd( 'bin/cake Websys.install init_configuration');
     $this->cmd( 'bin/cake Websys.install create_sections');
+    
+    $this->out( '=====================================');
+    $this->out( '¡BIEN! INSTALACIÓN FINALIZADA');
+    $this->out( '=====================================');
+    $this->out( '');
+    $this->out( 'Puedes acceder al website en http://'. $this->siteDomain);
+    $this->out( 'Entra como administrador en http://'. $this->siteDomain . '/admin/users/login');
+    $this->out( '');
+    $this->out( '¡Feliz trabajo!');
   }
   
+  
+/**
+ * General el fichero AppController.php tomándolo de la plantilla
+ *
+ * @return void
+ */
   private function __controller()
   {
     $this->interactive = false;
@@ -37,18 +74,32 @@ class InstallShell extends StartupShell
     $filename = APP . 'Controller' .DS. 'AppController.php';
     $this->createFile( $filename, $content);
   }
-  
+
+
+/**
+ * Genera los ficheros de configuración
+ * uploads.php
+ * routes.php
+ * events.php
+ * section.php
+ * asset_compress.ini
+ * management.php
+ * core.php
+ *
+ * @return void
+ */
   private function __configs()
   {
     // $this->interactive = false;
     $this->Template->templatePaths ['default'] = App::pluginPath( 'Websys') . 'Console' .DS. 'Templates' .DS. 'default' .DS;
     
-    $site_title = $this->in( 'Indica un nombre para el web');
-    $site_domain = $this->in( 'Indica un dominio para el web');
-    $this->Template->set( compact( array(
-        'site_title',
-        'site_domain'
-    )));
+    $this->siteTitle = $this->in( 'Indica un nombre para el web');
+    $this->siteDomain = $this->in( 'Indica un dominio para el web');
+    
+    $this->Template->set( array(
+        'site_title' => $this->siteTitle,
+        'site_domain' => $this->siteDomain
+    ));
     
     $configs = array(
         'upload' => 'upload.php',
@@ -68,8 +119,7 @@ class InstallShell extends StartupShell
       $this->createFile( $filename, $content);
     }
   }
-  
-  
+
   
 /**
  * Crea una configuración por defecto
@@ -96,6 +146,12 @@ class InstallShell extends StartupShell
     $Configuration->saveData( $data);
   }
   
+  
+/**
+ * Crea las secciones por defecto
+ *
+ * @return void
+ */
   public function create_sections()
   {
     $Section = ClassRegistry::init( 'Section.Section');
