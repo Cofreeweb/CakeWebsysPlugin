@@ -69,10 +69,13 @@ class InstallShell extends StartupShell
   private function __controller()
   {
     $this->interactive = false;
+    $this->header( 'Creando AppController');
+    $this->interactive = false;
     $this->Template->templatePaths ['default'] = App::pluginPath( 'Websys') . 'Console' .DS. 'Templates' .DS. 'default' .DS;
     $content = $this->Template->generate( 'controller', 'AppController');
     $filename = APP . 'Controller' .DS. 'AppController.php';
     $this->createFile( $filename, $content);
+    $this->interactive = true;
   }
 
 
@@ -90,6 +93,8 @@ class InstallShell extends StartupShell
  */
   private function __configs()
   {
+    $this->interactive = false;
+    $this->header( 'Creando ficheros de configuración');
     // $this->interactive = false;
     $this->Template->templatePaths ['default'] = App::pluginPath( 'Websys') . 'Console' .DS. 'Templates' .DS. 'default' .DS;
     
@@ -118,6 +123,7 @@ class InstallShell extends StartupShell
       $filename = APP . 'Config' .DS. $file;
       $this->createFile( $filename, $content);
     }
+    $this->interactive = true;
   }
 
   
@@ -129,6 +135,7 @@ class InstallShell extends StartupShell
  */
   public function init_configuration()
   {
+    $this->header( 'Creando configuración del website');
     $Configuration = ClassRegistry::init( 'Configuration.Configuration');
     
     $data = array(
@@ -154,6 +161,7 @@ class InstallShell extends StartupShell
  */
   public function create_sections()
   {
+    $this->header( 'Creando secciones por defecto');
     $Section = ClassRegistry::init( 'Section.Section');
     
     $data = array(
